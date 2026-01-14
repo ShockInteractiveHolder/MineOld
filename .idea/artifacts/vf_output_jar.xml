@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="vf_output:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/vf_output_jar</output-path>
+    <root id="archive" name="vf_output.jar">
+      <element id="module-output" name="vf_output" />
+      <element id="library" level="project" name="lwjgl" />
+    </root>
+  </artifact>
+</component>
