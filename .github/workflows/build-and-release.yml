@@ -1,47 +1,87 @@
-name: Build and Package
+name: build-and-release
 
 on:
   push:
-    branches:
-      - master
-  pull_request:
+    branches: [ main, master ]
 
 permissions:
   contents: write
 
 jobs:
-  build-and-zip:
+  build:
     runs-on: ubuntu-24.04
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up JDK 8
+      - name: Setup Java 8 (Temurin)
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 8
+          java-version: '8'
 
-      - name: Make Gradle wrapper executable
-        run: chmod +x ./gradlew
-
-      - name: Build vf_output
-        run: ./gradlew build
-
-      - name: Prepare zip folder
+      - name: Compile source (Java 8 + LWJGL)
         run: |
-          mkdir -p package
-          cp -r out/artifacts/vf_output_jar/vf_output.jar package/
-          cp -r libs package/
-          cp -r natives package/
-          cp terrain.png package/ || true
-          cp level.dat package/ || true
-          cp vf_output.iml package/ || true
-          cd package
-          zip -r ../vf_output.zip ./*
+          mkdir -p build/classes
+          javac \
+            -source 8 \
+            -target 8 \
+            -cp "libs/lwjgl-2.9.3.jar:libs/lwjgl_util-2.9.3.jar" \
+            -d build/classes \
+            $(find com -name "*.java")
 
-      - name: Upload vf_output.zip
+      - name: Copy resources
+        run: |
+          cp terrain.png level.dat build/classes/ || true
+          mkdir -p build/classes/META-INF
+          cp META-INF/MANIFEST.MF build/classes/META-INF/
+
+      - name: Create game jar
+        run: |
+          mkdir -p build/libs
+          jar cfm build/libs/rubydung.jar \
+            META-INF/MANIFEST.MF \
+            -C build/classes .
+
+      - name: Package LWJGL Linux natives
+        run: |
+          mkdir -p build/natives
+          unzip -q libs/lwjgl-platform-2.9.3-natives-linux.jar -d build/natives
+
+      - name: Include launchers
+        run: |
+          cp run.sh run.bat build/ || true
+
+      - name: Package LWJGL jars
+        run: |
+          mkdir -p build/libs
+          cp libs/lwjgl-2.9.3.jar build/libs/
+          cp libs/lwjgl_util-2.9.3.jar build/libs/
+
+      - name: Create vf_output.zip
+        run: |
+          cd build
+          zip -r vf_output.zip \
+            libs \
+            natives \
+            run.sh \
+            run.bat \
+            libs/rubydung.jar \
+            terrain.png \
+            level.dat \
+            META-INF
+
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: vf_output
-          path: vf_output.zip
+          path: build/vf_output.zip
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v0.0.${{ github.run_number }}
+          name: RubyDung 0.0.${{ github.run_number }}
+          files: build/vf_output.zip
+          generate_release_notes: true
