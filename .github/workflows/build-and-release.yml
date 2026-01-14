@@ -62,6 +62,13 @@ jobs:
         run: |
           cp run.sh build/
           cp run.bat build/
+      - name: package lwjgl jars
+        run: |
+          mkdir -p build/libs
+          cp libs/lwjgl-2.9.3.jar build/libs/
+          cp libs/lwjgl_util-2.9.3.jar build/libs/
+          cd build
+          zip -r lwjgl-jars.zip libs
 
       - name: create github release
         uses: softprops/action-gh-release@v2
@@ -71,6 +78,7 @@ jobs:
           files: |
             build/libs/rubydung.jar
             build/lwjgl-natives-linux.zip
+            build/lwjgl-jars.zip
             build/run.sh
             build/run.bat
           generate_release_notes: true
