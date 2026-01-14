@@ -55,28 +55,26 @@ public class Chunk {
                if (this.level.isTile(x, y, z)) {
                   int tex = 0;
 
-                  // ──────────────────────────────── CHANGED ───────────────────────────────
                   switch (currentTextureSet) {
-                     case 1: // Original RubyDung style
+                     case 1:
                         if      (y == this.level.depth * 2/3) tex = 1;     // grass
                         else if (y <  this.level.depth * 2/3) tex = 0;     // rock / dirt?
                         else                                  tex = 2;     // wood / leaves?
                         break;
 
-                     case 2: // Minecraft Classic 0.0.11a / early style
+                     case 2: // TODO:Fix this you retard! its all stone!!!
                         if      (y >= this.level.depth - 2)   tex = 2;     // "wood" → grass
                         else if (y == this.level.depth - 3)   tex = 1;     // transition / dirt
                         else                                  tex = 0;     // stone
                         break;
 
-                     case 3: // All stone / debug look
+                     case 3: // debug look/all stone
                         tex = 0;
                         break;
 
                      default:
                         tex = 0;
                   }
-                  // ───────────────────────────────────────────────────────────────────────
 
                   tiles++;
 
@@ -114,12 +112,12 @@ public class Chunk {
 
          if (key == Keyboard.KEY_1) {
             currentTextureSet = 1;
-            System.out.println("Texture set: Original RubyDung");
-            Level.setAllChunksDirty();     // you'll need to implement this
+            System.out.println("Texture set: RubyDung");
+            Level.setAllChunksDirty();
          }
          else if (key == Keyboard.KEY_2) {
             currentTextureSet = 2;
-            System.out.println("Texture set: Classic style");
+            System.out.println("Texture set: Classic");
             Level.setAllChunksDirty();
          }
          else if (key == Keyboard.KEY_3) {
