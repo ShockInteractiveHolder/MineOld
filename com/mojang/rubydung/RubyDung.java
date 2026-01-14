@@ -85,6 +85,8 @@ public class RubyDung implements Runnable {
                this.tick();
             }
 
+            Chunk.updateKeyboard();
+
             this.render(this.timer.a);
             frames++;
 
@@ -184,11 +186,11 @@ public class RubyDung implements Runnable {
       this.pick(a);
 
       while (Mouse.next()) {
-         if (Mouse.getEventButton() == 1 && Mouse.getEventButtonState() && this.hitResult != null) {
+         if (Mouse.getEventButton() == 0 && Mouse.getEventButtonState() && this.hitResult != null) {
             this.level.setTile(this.hitResult.x, this.hitResult.y, this.hitResult.z, 0);
          }
 
-         if (Mouse.getEventButton() == 0 && Mouse.getEventButtonState() && this.hitResult != null) {
+         if (Mouse.getEventButton() == 1 && Mouse.getEventButtonState() && this.hitResult != null) {
             int x = this.hitResult.x;
             int y = this.hitResult.y;
             int z = this.hitResult.z;

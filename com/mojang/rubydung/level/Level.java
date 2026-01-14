@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -17,6 +18,7 @@ public class Level {
    private byte[] blocks;
    private int[] lightDepths;
    private ArrayList<LevelListener> levelListeners = new ArrayList<>();
+   private static List<Chunk> chunks = new ArrayList<>();
 
    public Level(int w, int h, int d) {
       this.width = w;
@@ -38,6 +40,10 @@ public class Level {
       this.load();
    }
 
+   public void addChunk(Chunk c) {
+      chunks.add(c);
+   }
+
    public void load() {
       try {
          DataInputStream dis = new DataInputStream(new GZIPInputStream(new FileInputStream(new File("level.dat"))));
@@ -51,6 +57,12 @@ public class Level {
          dis.close();
       } catch (Exception var3) {
          var3.printStackTrace();
+      }
+   }
+
+   public static void setAllChunksDirty() {
+      for (Chunk c : chunks) {
+         if (c != null) c.setDirty();
       }
    }
 
